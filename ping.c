@@ -417,14 +417,8 @@ main(int argc, char **argv)
 			options |= F_QUIET;
 			break;
 		case 'Q':
-			/* IPv4 */
-			settos = parsetos(optarg);
-			/* IPv6 */
-			tclass = hextoui(optarg);
-			if (errno || (tclass & ~0xff)) {
-				fprintf(stderr, "ping: Invalid tclass %s\n", optarg);
-				exit(2);
-			}
+			settos = parsetos(optarg); /* IPv4 */
+			tclass = settos; /* IPv6 */
 			break;
 		case 'r':
 			options |= F_SO_DONTROUTE;
@@ -1628,7 +1622,7 @@ int parsetos(char *str)
 		exit(2);
 	}
 
-	if (tos > TOS_MAX) {
+	if (tos >= TOS_MAX) {
 		fprintf(stderr, "ping: the decimal value of TOS bits must be in range 0-255\n");
 		exit(2);
 	}
