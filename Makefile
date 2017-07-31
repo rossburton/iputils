@@ -247,7 +247,6 @@ snapshot:
 	@sed -e "s/^%define ssdate .*/%define ssdate $(DATE)/" iputils.spec > iputils.spec.tmp
 	@mv iputils.spec.tmp iputils.spec
 	@echo "#define SNAPSHOT \"$(TAG)\"" > SNAPSHOT.h
-	@$(MAKE) -C doc snapshot
 	@$(MAKE) man
 	@git commit -a -m "iputils-$(TAG)"
 	@git tag -s -m "iputils-$(TAG)" $(TAG)
