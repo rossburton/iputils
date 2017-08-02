@@ -849,10 +849,10 @@ restamp:
 	return 0;
 }
 
-static long llsqrt(long long a)
+static unsigned long llsqrt(unsigned long long a)
 {
-	long long prev = ~((long long)1 << 63);
-	long long x = a;
+	unsigned long long prev = ~((unsigned long long)1 << 63);
+	unsigned long long x = a;
 
 	if (x > 0) {
 		while (x < prev) {
@@ -861,7 +861,7 @@ static long llsqrt(long long a)
 		}
 	}
 
-	return (long)x;
+	return (unsigned long)x;
 }
 
 /*
@@ -895,17 +895,17 @@ void finish(void)
 	putchar('\n');
 
 	if (nreceived && timing) {
-		long tmdev;
+		unsigned long tmdev;
 
 		tsum /= nreceived + nrepeats;
 		tsum2 /= nreceived + nrepeats;
 		tmdev = llsqrt(tsum2 - tsum * tsum);
 
-		printf("rtt min/avg/max/mdev = %ld.%03ld/%lu.%03ld/%ld.%03ld/%ld.%03ld ms",
+		printf("rtt min/avg/max/mdev = %ld.%03ld/%lu.%03ld/%ld.%03ld/%lu.%03lu ms",
 		       (long)tmin/1000, (long)tmin%1000,
 		       (unsigned long)(tsum/1000), (long)(tsum%1000),
 		       (long)tmax/1000, (long)tmax%1000,
-		       (long)tmdev/1000, (long)tmdev%1000
+		       (unsigned long)tmdev/1000, (unsigned long)tmdev%1000
 		       );
 		comma = ", ";
 	}
