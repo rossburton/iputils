@@ -869,7 +869,7 @@ int ping4_run(int argc, char **argv, struct addrinfo *ai, socket_st *sock)
 		exit(2);
 	}
 
-	if (datalen >= sizeof(struct timeval))	/* can we time transfer */
+	if (datalen >= (signed int)sizeof(struct timeval))	/* can we time transfer */
 		timing = 1;
 	packlen = datalen + MAXIPLEN + MAXICMPLEN;
 	if (!(packet = (unsigned char *)malloc((unsigned int)packlen))) {
@@ -879,7 +879,7 @@ int ping4_run(int argc, char **argv, struct addrinfo *ai, socket_st *sock)
 
 	printf("PING %s (%s) ", hostname, inet_ntoa(whereto.sin_addr));
 	if (device || (options&F_STRICTSOURCE))
-		printf("from %s %s: ", inet_ntoa(source.sin_addr), device ?: "");
+		printf("from %s %s: ", inet_ntoa(source.sin_addr), device ? device : "");
 	printf("%d(%d) bytes of data.\n", datalen, datalen+8+optlen+20);
 
 	setup(sock);
@@ -940,7 +940,7 @@ int ping4_receive_error_msg(socket_st *sock)
 	} else if (e->ee_origin == SO_EE_ORIGIN_ICMP) {
 		struct sockaddr_in *sin = (struct sockaddr_in*)(e+1);
 
-		if (res < sizeof(icmph) ||
+		if (res < (signed int)sizeof(icmph) ||
 		    target.sin_addr.s_addr != whereto.sin_addr.s_addr ||
 		    icmph.type != ICMP_ECHO ||
 		    !is_ours(sock, icmph.un.echo.id)) {
@@ -978,7 +978,7 @@ int ping4_receive_error_msg(socket_st *sock)
 
 out:
 	errno = saved_errno;
-	return net_errors ? : -local_errors;
+	return net_errors ? net_errors : -local_errors;
 }
 
 /*
@@ -995,6 +995,7 @@ int ping4_send_probe(socket_st *sock, void *packet, unsigned packet_size)
 	int cc;
 	int i;
 
+	(void) packet_size;
 	icp = (struct icmphdr *)packet;
 	icp->type = ICMP_ECHO;
 	icp->code = 0;
@@ -1042,6 +1043,7 @@ static
 void pr_echo_reply(__u8 *_icp, int len)
 {
 	struct icmphdr *icp = (struct icmphdr *)_icp;
+	(void) len;
 	printf(" icmp_seq=%u", ntohs(icp->un.echo.sequence));
 }
 
@@ -1125,7 +1127,7 @@ ping4_parse_reply(struct socket_st *sock, struct msghdr *msg, int cc, void *addr
 				struct iphdr * iph = (struct  iphdr *)(&icp[1]);
 				struct icmphdr *icp1 = (struct icmphdr*)((unsigned char *)iph + iph->ihl*4);
 				int error_pkt;
-				if (cc < 8+sizeof(struct iphdr)+8 ||
+				if (cc < (signed int)(8+sizeof(struct iphdr)+8) ||
 				    cc < 8+iph->ihl*4+8)
 					return 1;
 				if (icp1->type != ICMP_ECHO ||
