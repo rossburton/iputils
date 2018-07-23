@@ -231,3 +231,7 @@ rpm:
 	@$(RPMBUILD) -ta --define 'current yes' $(RPMTMP)/iputils.tar.bz2
 	@rm -f $(RPMTMP)/iputils.tar.bz2
 
+install:
+	for $t in $(TARGETS); do \
+		install -D $t ${DESTDIR}${bindir}/$t \
+	done
